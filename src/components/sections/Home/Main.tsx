@@ -2,22 +2,25 @@
 import Image from 'next/image';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { Chip, Stack } from '@mui/material';
+import { Chip, CircularProgress, Stack } from '@mui/material';
 import usePokemons from '@/hooks/usePokemons';
 const Main = () => {
   const { pokemons } = usePokemons();
   const [prevPokemon, setPrevPokemon] = useState<any>();
+  const[isLoading, setIsLoading] = useState(false)
   useEffect(() => {
     axios.get(`https://pokeapi.co/api/v2/pokemon/1`).then((pokemon: any) => {
       setPrevPokemon(pokemon?.data);
     });
   }, []);
   const getNewPrevPokemon = async (name: string) => {
+    setIsLoading(true)
     await axios
       .get(`https://pokeapi.co/api/v2/pokemon/${name}`)
       .then((pokemon: any) => {
         setPrevPokemon(pokemon?.data);
       });
+    setIsLoading(false)
   };
   return (
     <div className="flex sm:h-[500px] xl:flex-row flex-col w-full justify-between items-center">
@@ -42,12 +45,13 @@ const Main = () => {
         </Stack>
       </div>
       <div className="bg-black sm:w-[484px] sm:px-[44px] flex flex-col w-full mt-[40px] px-[10px]  h-[500px] pt-[44px] pb-[25px]">
-        <div className="flex sm:w-[400px] w-[full] h-[300px] flex-col relative items-start">
+      <div className="flex sm:w-[400px] w-[full] h-[300px] flex-col relative items-start">
           {prevPokemon && (
             <h1 className="text-[#A0A0A0] text-[48px] font-[700] mb-[44px]">
               {prevPokemon?.name}
             </h1>
           )}
+          {isLoading && <CircularProgress className='absolute top-[50%] left-[50%]'/>}
           {prevPokemon && (
             <Image
               src={prevPokemon?.sprites?.front_shiny}
